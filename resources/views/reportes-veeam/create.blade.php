@@ -204,8 +204,8 @@
                     rows="4"
                     maxlength="1000"
                     class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Agregar una nota de seguimiento inicial (opcional)">{{ old('seguimiento') }}</textarea>
-                <p class="text-xs text-gray-500 mt-1">Opcional. Se agregará con tu nombre y la fecha actual.</p>
+                    placeholder="Agregar una nota de seguimiento inicial (opcional)">{{ old('seguimiento', 'Se envía correo informativo al cliente') }}</textarea>
+                <p class="text-xs text-gray-500 mt-1">Texto predeterminado. Puedes editarlo o eliminarlo.</p>
             </div>
             @else
             {{-- Seguimiento existente (solo lectura) --}}
