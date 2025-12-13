@@ -113,6 +113,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Reportes Veeam
     // Reportes Veeam
     Route::prefix('reportes-veeam')->name('reportes-veeam.')->group(function () {
+        Route::get('/', [ReporteVeeamController::class, 'index'])->name('index');
+        Route::get('/historico', [ReporteVeeamController::class, 'historico'])->name('historico');
         Route::get('/create', [ReporteVeeamController::class, 'create'])->name('create');
         Route::post('/', [ReporteVeeamController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [ReporteVeeamController::class, 'edit'])->name('edit');
