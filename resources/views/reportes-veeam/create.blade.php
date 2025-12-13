@@ -26,21 +26,6 @@
                 Seguimiento Reportes
             </a>
         </div>
-        <div class="flex flex-col gap-4 mb-6">
-            <a href="{{ route('incidentes.create') }}" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-center">
-                Nuevo Incidente
-            </a>
-        </div>
-        <div class="flex flex-col gap-4 mb-6">
-            <a href="{{ route('procesos.conversor.convertir') }}" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-center">
-                Consultor de Procesos
-            </a>
-        </div>
-        <div class="flex flex-col gap-4 mb-6">
-            <a href="{{ url('/procesos/mantenedor') }}" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-center">
-                Mantenedor de Procesos
-            </a>
-        </div>
 
         @if(isset($reportesHoy) && count($reportesHoy) > 0)
         <h2 class="text-lg font-semibold mb-3 mt-6">Reportes del Día</h2>
