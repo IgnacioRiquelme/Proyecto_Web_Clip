@@ -18,7 +18,7 @@
             <div class="flex flex-col gap-4 w-full max-w-sm">
                 <a href="{{ route('requerimientos.create') }}" class="bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-6 rounded-md text-center font-medium shadow">Nuevo Requerimiento</a>
                 <a href="{{ route('incidentes.create') }}" class="bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-6 rounded-md text-center font-medium shadow">Nuevo Incidente</a>
-                <a href="#" class="bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-6 rounded-md text-center font-medium shadow">Reporte Veeam y TCM</a>
+                <a href="{{ route('reportes-veeam.create') }}" class="bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-6 rounded-md text-center font-medium shadow">Reporte Veeam y TCM</a>
                 <a href="{{ route('procesos.malla') }}" class="bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-6 rounded-md text-center font-medium shadow">Bitácora de Procesos</a>
                 <a href="{{ route('carga.requerimientos.form') }}" class="bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-6 rounded-md text-center font-medium shadow">📥 Cargar Requerimientos (Excel)</a>
                 <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md text-center font-medium mt-4 shadow">Salir</a>

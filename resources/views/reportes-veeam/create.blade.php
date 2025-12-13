@@ -2,78 +2,85 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>{{ $reporte ? 'Editar' : 'Ingresar' }} Reporte Veeam</title>
+    <title>{{ isset($reporte) ? 'Editar Reporte Veeam' : 'Nuevo Reporte Veeam' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tom Select -->
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
     <style>
-        .ts-control {
-            border-radius: 0.375rem !important;
-            border-color: rgb(209 213 219) !important;
-            padding: 0.5rem !important;
-            background-color: white !important;
-        }
-        .ts-wrapper {
-            border-radius: 0.375rem;
+        .campo-requerido::after {
+            content: " *";
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex items-center justify-center py-12">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center py-12">
 
-<div class="flex w-full max-w-6xl bg-white p-8 rounded-lg shadow-lg border border-red-200">
+<div class="flex w-full max-w-7xl bg-white p-8 rounded-lg shadow-lg border border-indigo-200">
     {{-- Menú lateral --}}
     <aside class="w-1/4 bg-gray-100 p-4 border-r border-gray-300">
         <h2 class="text-lg font-semibold mb-4">Acciones</h2>
         <div class="flex flex-col gap-4 mb-6">
-            <a href="{{ route('reportes-veeam.dia') }}" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-center">
-                Reportes del día
+            <a href="{{ route('reportes-veeam.index') }}" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-center">
+                Seguimiento Reportes
             </a>
-            <a href="{{ route('reportes-veeam.pendientes') }}" class="w-full bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 text-center">
-                Reportes Pendientes
+        </div>
+        <div class="flex flex-col gap-4 mb-6">
+            <a href="{{ route('incidentes.create') }}" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-center">
+                Nuevo Incidente
+            </a>
+        </div>
+        <div class="flex flex-col gap-4 mb-6">
+            <a href="{{ route('procesos.conversor.convertir') }}" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-center">
+                Consultor de Procesos
+            </a>
+        </div>
+        <div class="flex flex-col gap-4 mb-6">
+            <a href="{{ url('/procesos/mantenedor') }}" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-center">
+                Mantenedor de Procesos
             </a>
         </div>
 
-        <h2 class="text-lg font-semibold mb-3">Filtros</h2>
-        <form action="{{ route('reportes-veeam.filtrados') }}" method="POST">
-            @csrf
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-2">Fecha Inicio</label>
-                <input type="date" name="fecha_desde" class="w-full border border-gray-300 rounded p-2">
+        @if(isset($reportesHoy) && count($reportesHoy) > 0)
+        <h2 class="text-lg font-semibold mb-3 mt-6">Reportes del Día</h2>
+        <div class="space-y-2 max-h-96 overflow-y-auto">
+            @foreach($reportesHoy as $rep)
+            <div class="border border-gray-300 p-3 rounded bg-white hover:bg-gray-50">
+                <div class="text-xs text-gray-500">Ticket: {{ $rep->numero_ticket }}</div>
+                <div class="text-sm font-semibold mt-1">{{ Str::limit($rep->job_fallido, 40) }}</div>
+                <div class="text-xs mt-1">
+                    <span class="px-2 py-1 rounded text-white {{ $rep->estado === 'Failed' ? 'bg-red-500' : 'bg-yellow-500' }}">
+                        {{ $rep->estado }}
+                    </span>
+                    <span class="ml-2 px-2 py-1 rounded bg-blue-500 text-white">
+                        {{ $rep->estado_ticket }}
+                    </span>
+                </div>
+                <a href="{{ route('reportes-veeam.edit', $rep->id) }}" class="text-blue-600 hover:underline text-xs mt-2 inline-block">
+                    Editar
+                </a>
             </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-2">Fecha Fin</label>
-                <input type="date" name="fecha_hasta" class="w-full border border-gray-300 rounded p-2">
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-2">Estado</label>
-                <select name="filtro_estado" class="w-full border border-gray-300 rounded p-2">
-                    <option value="">Todos</option>
-                    @foreach($estados as $estado)
-                        <option value="{{ $estado->nombre }}">{{ $estado->nombre }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium mb-2">Estado Ticket</label>
-                <select name="filtro_estado_ticket" class="w-full border border-gray-300 rounded p-2">
-                    <option value="">Todos</option>
-                    @foreach($estadosTicket as $estadoTicket)
-                        <option value="{{ $estadoTicket->nombre }}">{{ $estadoTicket->nombre }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <button type="submit" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-                Filtrar
-            </button>
-        </form>
+            @endforeach
+        </div>
+        @endif
     </aside>
 
     {{-- Formulario --}}
     <div class="flex-1 pl-8">
-        <h1 class="text-3xl font-bold text-red-600 text-center mb-10">
-            {{ $reporte ? '✏️ Editar Reporte Veeam' : '🔴 Nuevo Reporte Veeam' }}
+        <h1 class="text-3xl font-bold text-indigo-600 text-center mb-10">
+            {{ isset($reporte) ? '✏️ Editar Reporte Veeam' : '📝 Nuevo Reporte Veeam' }}
         </h1>
+
+        @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         @if (session('success'))
             <div class="bg-green-100 border border-green-300 text-green-700 p-3 rounded mb-4">
@@ -81,302 +88,242 @@
             </div>
         @endif
 
-        <form 
-            action="{{ $reporte ? route('reportes-veeam.update', $reporte->id) : route('reportes-veeam.store') }}" 
-            method="POST" 
-            class="grid grid-cols-2 gap-6"
-        >
+        <form method="POST" action="{{ isset($reporte) ? route('reportes-veeam.update', $reporte->id) : route('reportes-veeam.store') }}" class="space-y-6">
             @csrf
-            @if($reporte)
+            @if(isset($reporte))
                 @method('PUT')
             @endif
 
-            {{-- Número de Ticket --}}
-            <label class="uppercase text-base font-semibold text-gray-700">Número de Ticket</label>
+            {{-- Ticket --}}
             <div>
-                <input type="text" name="numero_ticket"
-                    value="{{ old('numero_ticket', $reporte->numero_ticket ?? 'N/A') }}"
-                    class="p-2 border border-gray-300 rounded w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500">
-                @error('numero_ticket')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
+                <label for="numero_ticket" class="block text-sm font-medium text-gray-700">
+                    Ticket
+                </label>
+                <input 
+                    type="text" 
+                    name="numero_ticket" 
+                    id="numero_ticket"
+                    value="{{ old('numero_ticket', isset($reporte) ? $reporte->numero_ticket : 'N/A') }}" 
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Número de ticket (opcional)">
+                <p class="text-xs text-gray-500 mt-1">Por defecto se asigna "N/A". Acepta números y letras.</p>
             </div>
 
             {{-- Fecha Inicio --}}
-            <label class="uppercase text-base font-semibold text-gray-700">Fecha Inicio</label>
             <div>
-                <input type="date" name="fecha_inicio" id="fecha_inicio"
-                    value="{{ old('fecha_inicio', $reporte->fecha_inicio ?? now()->format('Y-m-d')) }}"
-                    class="p-2 border border-gray-300 rounded w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-                    required>
-                @error('fecha_inicio')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
+                <label for="fecha_inicio" class="block text-sm font-medium text-gray-700 campo-requerido">
+                    Fecha Inicio
+                </label>
+                <input 
+                    type="text" 
+                    name="fecha_inicio" 
+                    id="fecha_inicio"
+                    value="{{ old('fecha_inicio', isset($reporte) ? $reporte->fecha_inicio->format('d/m/Y') : now()->format('d/m/Y')) }}" 
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    required
+                    placeholder="dd/mm/aaaa">
+                <p class="text-xs text-gray-500 mt-1">Por defecto carga la fecha del sistema. Puedes editar haciendo clic o escribiendo directamente.</p>
             </div>
 
             {{-- Fecha Fin --}}
-            <label class="uppercase text-base font-semibold text-gray-700">Fecha Fin</label>
             <div>
-                <input type="date" name="fecha_fin" id="fecha_fin"
-                    value="{{ old('fecha_fin', $reporte->fecha_fin ?? '') }}"
-                    class="p-2 border border-gray-300 rounded w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500">
-                <small class="text-gray-500">Se llena automáticamente según el estado</small>
-                @error('fecha_fin')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
+                <label for="fecha_fin" class="block text-sm font-medium text-gray-700">
+                    Fecha Fin
+                </label>
+                <input 
+                    type="text" 
+                    name="fecha_fin" 
+                    id="fecha_fin"
+                    value="{{ old('fecha_fin', isset($reporte) && $reporte->fecha_fin ? $reporte->fecha_fin->format('d/m/Y') : '') }}" 
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="dd/mm/aaaa">
+                <p class="text-xs text-gray-500 mt-1">Se completa automáticamente si el Estado del Ticket es "Informativo" o cambia a "Resuelto".</p>
             </div>
 
             {{-- Estado --}}
-            <label class="uppercase text-base font-semibold text-gray-700">Estado</label>
             <div>
-                <select name="estado" id="estado" class="searchable-create w-full" required>
-                    <option value="" disabled {{ !$reporte ? 'selected' : '' }}>Seleccione un estado</option>
-                    @foreach($estados as $estado)
-                        <option value="{{ $estado->nombre }}" @selected(old('estado', $reporte->estado ?? '') == $estado->nombre)>
-                            {{ $estado->nombre }}
-                        </option>
-                    @endforeach
+                <label for="estado" class="block text-sm font-medium text-gray-700 campo-requerido">
+                    Estado
+                </label>
+                <select 
+                    name="estado" 
+                    id="estado"
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    required>
+                    <option value="">Seleccione...</option>
+                    <option value="Warning" {{ old('estado', isset($reporte) ? $reporte->estado : '') === 'Warning' ? 'selected' : '' }}>Warning</option>
+                    <option value="Failed" {{ old('estado', isset($reporte) ? $reporte->estado : '') === 'Failed' ? 'selected' : '' }}>Failed</option>
                 </select>
-                @error('estado')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
             </div>
 
             {{-- Job Fallido --}}
-            <label class="uppercase text-base font-semibold text-gray-700">Job Fallido</label>
             <div>
-                <select name="job_fallido" id="job_fallido" class="searchable-create w-full" required>
-                    <option value="" disabled {{ !$reporte ? 'selected' : '' }}>Seleccione un job</option>
-                    @foreach($jobsFallidos as $job)
-                        <option value="{{ $job->nombre }}" @selected(old('job_fallido', $reporte->job_fallido ?? '') == $job->nombre)>
-                            {{ $job->nombre }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('job_fallido')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
+                <label for="job_fallido" class="block text-sm font-medium text-gray-700 campo-requerido">
+                    Job Fallido
+                </label>
+                <input 
+                    type="text" 
+                    name="job_fallido" 
+                    id="job_fallido"
+                    value="{{ old('job_fallido', isset($reporte) ? $reporte->job_fallido : '') }}" 
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    required
+                    maxlength="500"
+                    placeholder="Nombre del job reportado">
+                <p class="text-xs text-gray-500 mt-1">Puedes copiar y pegar el nombre del job.</p>
             </div>
-
-            {{-- Seguimiento --}}
-            <label class="uppercase text-base font-semibold text-gray-700 col-span-2">
-                Seguimiento {{ $reporte && $reporte->estado === 'Failed' ? '(Editable)' : '' }}
-            </label>
-
-            @if($reporte && $reporte->seguimiento)
-                {{-- Mostrar seguimientos anteriores en modo edición --}}
-                <div class="col-span-2">
-                    <textarea name="seguimiento" id="seguimiento"
-                        class="p-2 border border-gray-300 rounded w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500" 
-                        rows="6">{{ old('seguimiento', $reporte->seguimiento) }}</textarea>
-                    <small class="text-gray-500">Puedes editar el texto completo arriba</small>
-                </div>
-                
-                @if($reporte->estado === 'Failed')
-                    {{-- Campo para agregar nuevo seguimiento solo en Failed --}}
-                    <div class="col-span-2 mt-4 border-t pt-4">
-                        <label class="block text-base font-semibold text-green-700 mb-2">
-                            ➕ Agregar Nuevo Seguimiento
-                        </label>
-                        <textarea name="seguimiento_nuevo" id="seguimiento_nuevo" 
-                            placeholder="Escribe aquí el nuevo seguimiento (se agregará con la fecha actual)"
-                            class="p-2 border border-green-300 rounded w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" 
-                            rows="3">{{ old('seguimiento_nuevo', '') }}</textarea>
-                        <small class="text-gray-500">Este se agregará debajo de los anteriores con la fecha actual</small>
-                    </div>
-                @endif
-            @else
-                {{-- Modo creación --}}
-                <textarea name="seguimiento" id="seguimiento" placeholder="Ej: Se envía un correo de carácter informativo"
-                    class="p-2 border border-gray-300 rounded w-full col-span-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500" 
-                    rows="3">{{ old('seguimiento', '') }}</textarea>
-            @endif
-
-            @error('seguimiento')
-                <span class="text-red-500 text-sm col-span-2">{{ $message }}</span>
-            @enderror
-            @error('seguimiento_nuevo')
-                <span class="text-red-500 text-sm col-span-2">{{ $message }}</span>
-            @enderror
 
             {{-- Descripción del Error --}}
-            <label class="uppercase text-base font-semibold text-gray-700 col-span-2">Descripción del Error</label>
-            <textarea name="descripcion_error" placeholder="Descripción detallada del error"
-                class="p-2 border border-gray-300 rounded w-full col-span-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500" 
-                rows="4" required>{{ old('descripcion_error', $reporte->descripcion_error ?? '') }}</textarea>
-            @error('descripcion_error')
-                <span class="text-red-500 text-sm col-span-2">{{ $message }}</span>
-            @enderror
-
-            {{-- Estado Ticket --}}
-            <label class="uppercase text-base font-semibold text-gray-700">Estado Ticket</label>
             <div>
-                <select name="estado_ticket" id="estado_ticket" class="searchable-create w-full" required>
-                    <option value="" disabled>Seleccione estado del ticket</option>
-                    @foreach($estadosTicket as $estadoTicket)
-                        <option value="{{ $estadoTicket->nombre }}" @selected(old('estado_ticket', $reporte->estado_ticket ?? '') == $estadoTicket->nombre)>
-                            {{ $estadoTicket->nombre }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('estado_ticket')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
+                <label for="descripcion_error" class="block text-sm font-medium text-gray-700 campo-requerido">
+                    Descripción del Error
+                </label>
+                <textarea 
+                    name="descripcion_error" 
+                    id="descripcion_error"
+                    rows="6"
+                    maxlength="3000"
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    required
+                    placeholder="Detalle de los errores del reporte Veeam (máx. 3000 caracteres)">{{ old('descripcion_error', isset($reporte) ? $reporte->descripcion_error : '') }}</textarea>
+                <p class="text-xs text-gray-500 mt-1">Máximo 3000 caracteres. Puedes copiar y pegar.</p>
             </div>
+
+            {{-- Estado del Ticket --}}
+            <div>
+                <label for="estado_ticket" class="block text-sm font-medium text-gray-700 campo-requerido">
+                    Estado del Ticket
+                </label>
+                <select 
+                    name="estado_ticket" 
+                    id="estado_ticket"
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    required>
+                    <option value="">Seleccione...</option>
+                    <option value="Informativo" {{ old('estado_ticket', isset($reporte) ? $reporte->estado_ticket : '') === 'Informativo' ? 'selected' : '' }}>Informativo</option>
+                    <option value="Pendiente" {{ old('estado_ticket', isset($reporte) ? $reporte->estado_ticket : '') === 'Pendiente' ? 'selected' : '' }}>Pendiente</option>
+                    <option value="Resuelto" {{ old('estado_ticket', isset($reporte) ? $reporte->estado_ticket : '') === 'Resuelto' ? 'selected' : '' }}>Resuelto</option>
+                </select>
+                <p class="text-xs text-gray-500 mt-1">Afecta el campo "Fecha Fin" y la posibilidad de agregar seguimiento.</p>
+            </div>
+
+            {{-- Seguimiento (solo crear/editar) --}}
+            @if(!isset($reporte))
+            <div id="seguimiento_inicial_container">
+                <label for="seguimiento" class="block text-sm font-medium text-gray-700">
+                    Seguimiento Inicial
+                </label>
+                <textarea 
+                    name="seguimiento" 
+                    id="seguimiento"
+                    rows="4"
+                    maxlength="1000"
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Agregar una nota de seguimiento inicial (opcional)">{{ old('seguimiento') }}</textarea>
+                <p class="text-xs text-gray-500 mt-1">Opcional. Se agregará con tu nombre y la fecha actual.</p>
+            </div>
+            @else
+            {{-- Seguimiento existente (solo lectura) --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    Historial de Seguimiento
+                </label>
+                <textarea 
+                    name="seguimiento" 
+                    rows="8"
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 bg-gray-50"
+                    readonly>{{ $reporte->seguimiento }}</textarea>
+            </div>
+
+            {{-- Nuevo seguimiento (solo si estado_ticket es Pendiente) --}}
+            <div id="seguimiento_nuevo_container" style="display: none;">
+                <label for="seguimiento_nuevo" class="block text-sm font-medium text-gray-700">
+                    Agregar Nuevo Seguimiento
+                </label>
+                <textarea 
+                    name="seguimiento_nuevo" 
+                    id="seguimiento_nuevo"
+                    rows="4"
+                    maxlength="1000"
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Agregar una nueva nota de seguimiento"></textarea>
+                <p class="text-xs text-gray-500 mt-1">Se agregará al historial con tu nombre y la fecha actual.</p>
+            </div>
+            @endif
 
             {{-- Botones --}}
-            <div class="col-span-2 flex justify-between items-center mt-4">
-                <a href="{{ route('menu.analista') }}"
-                    class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded font-medium shadow transition">
-                    Menú
+            <div class="flex justify-between items-center pt-6">
+                <a href="{{ route('reportes-veeam.create') }}" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600">
+                    Cancelar
                 </a>
-                @if(!$reporte)
-                <button type="button"
-                    onclick="pedirTicketEditar()"
-                    class="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded font-medium shadow transition mx-2">
-                    Editar Reporte
-                </button>
-                @endif
-                <button type="submit"
-                    class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded font-medium shadow transition">
-                    {{ $reporte ? 'Actualizar' : 'Guardar' }}
+                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">
+                    {{ isset($reporte) ? 'Actualizar Reporte' : 'Guardar Reporte' }}
                 </button>
             </div>
+
+            @if(isset($reporte))
+            <div class="pt-4 border-t">
+                <form method="POST" action="{{ route('reportes-veeam.destroy', $reporte->id) }}" onsubmit="return confirm('¿Estás seguro de eliminar este reporte?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700">
+                        Eliminar Reporte
+                    </button>
+                </form>
+            </div>
+            @endif
         </form>
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const fechaFinInput = document.getElementById('fecha_fin');
-        const fechaInicioInput = document.getElementById('fecha_inicio');
-        const seguimientoTextarea = document.getElementById('seguimiento');
-        
-        const esEdicion = {{ $reporte ? 'true' : 'false' }};
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar Flatpickr para campos de fecha
+    const fpConfig = {
+        dateFormat: 'd/m/Y',
+        locale: 'es',
+        allowInput: true,
+    };
 
-        function getFechaActual() {
-            const hoy = new Date();
-            const dia = String(hoy.getDate()).padStart(2, '0');
-            const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-            const anio = hoy.getFullYear();
-            return `${dia}-${mes}-${anio}`;
+    flatpickr('#fecha_inicio', fpConfig);
+    flatpickr('#fecha_fin', fpConfig);
+
+    // Lógica para mostrar/ocultar campo de seguimiento nuevo
+    const estadoTicket = document.getElementById('estado_ticket');
+    const fechaFinInput = document.getElementById('fecha_fin');
+    const seguimientoNuevoContainer = document.getElementById('seguimiento_nuevo_container');
+
+    function actualizarCampos() {
+        const estado = estadoTicket.value;
+
+        // Mostrar campo de nuevo seguimiento solo si estado es Pendiente (en modo edición)
+        if (seguimientoNuevoContainer) {
+            if (estado === 'Pendiente') {
+                seguimientoNuevoContainer.style.display = 'block';
+            } else {
+                seguimientoNuevoContainer.style.display = 'none';
+            }
         }
 
-        const estadoSelectInstance = new TomSelect('#estado', {
-            create: true,
-            persist: false,
-            maxOptions: 200,
-            sortField: { field: "text", direction: "asc" },
-            placeholder: 'Buscar o escribir nuevo...',
-            createOnBlur: true,
-            onChange: function(value) {
-                const fechaActual = getFechaActual();
-
-                if (value === 'Warning') {
-                    fechaFinInput.value = fechaInicioInput.value;
-                    estadoTicketSelectInstance.setValue('Informativo');
-                    
-                    if (!esEdicion && !seguimientoTextarea.value.trim()) {
-                        seguimientoTextarea.value = `${fechaActual} Se envía correo de carácter informativo`;
-                    }
-                    
-                    if (!esEdicion) {
-                        seguimientoTextarea.readOnly = true;
-                        seguimientoTextarea.classList.add('bg-gray-100', 'cursor-not-allowed');
-                    }
-                    
-                } else if (value === 'Failed') {
-                    fechaFinInput.value = '';
-                    estadoTicketSelectInstance.setValue('Pendiente');
-                    
-                    if (!esEdicion && !seguimientoTextarea.value.trim()) {
-                        seguimientoTextarea.value = `${fechaActual} Se envía correo a Emtec para su información y reprocesamiento`;
-                    }
-                    
-                    seguimientoTextarea.readOnly = false;
-                    seguimientoTextarea.classList.remove('bg-gray-100', 'cursor-not-allowed');
-                    
-                } else {
-                    seguimientoTextarea.readOnly = false;
-                    seguimientoTextarea.classList.remove('bg-gray-100', 'cursor-not-allowed');
-                }
-            },
-            onItemAdd: function(value, item) {
-                guardarNuevoValor('estado', value);
+        // Auto-completar fecha_fin si es Informativo o Resuelto
+        if (estado === 'Informativo' || estado === 'Resuelto') {
+            if (!fechaFinInput.value || fechaFinInput.value === '') {
+                const hoy = new Date();
+                const dia = String(hoy.getDate()).padStart(2, '0');
+                const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+                const anio = hoy.getFullYear();
+                fechaFinInput.value = `${dia}/${mes}/${anio}`;
             }
-        });
-
-        const jobFallidoSelectInstance = new TomSelect('#job_fallido', {
-            create: true,
-            persist: false,
-            maxOptions: 200,
-            sortField: { field: "text", direction: "asc" },
-            placeholder: 'Buscar o escribir nuevo...',
-            createOnBlur: true,
-            onItemAdd: function(value, item) {
-                guardarNuevoValor('job_fallido', value);
-            }
-        });
-
-        const estadoTicketSelectInstance = new TomSelect('#estado_ticket', {
-            create: true,
-            persist: false,
-            maxOptions: 200,
-            sortField: { field: "text", direction: "asc" },
-            placeholder: 'Buscar o escribir nuevo...',
-            createOnBlur: true,
-            onChange: function(value) {
-                if (value === 'Resuelto' && !fechaFinInput.value) {
-                    fechaFinInput.value = new Date().toISOString().split('T')[0];
-                }
-            },
-            onItemAdd: function(value, item) {
-                guardarNuevoValor('estado_ticket', value);
-            }
-        });
-
-        fechaInicioInput.addEventListener('change', function () {
-            if (estadoSelectInstance.getValue() === 'Warning') {
-                fechaFinInput.value = this.value;
-            }
-        });
-
-        if (!esEdicion && estadoSelectInstance.getValue() === 'Warning') {
-            seguimientoTextarea.readOnly = true;
-            seguimientoTextarea.classList.add('bg-gray-100', 'cursor-not-allowed');
-        }
-    });
-
-    function guardarNuevoValor(campo, valor) {
-        let url = '';
-        
-        if (campo === 'estado') url = '{{ route("veeam.guardar-estado") }}';
-        else if (campo === 'job_fallido') url = '{{ route("veeam.guardar-job") }}';
-        else if (campo === 'estado_ticket') url = '{{ route("veeam.guardar-estado-ticket") }}';
-
-        if (url) {
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ nombre: valor })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) console.log('✅ Guardado:', valor);
-            })
-            .catch(error => console.error('Error:', error));
         }
     }
 
-    function pedirTicketEditar() {
-        const id = prompt('Ingrese el ID del reporte a editar:');
-        if (id && id.trim() !== '') {
-            window.location.href = '/reportes-veeam/' + encodeURIComponent(id.trim()) + '/edit';
-        }
+    if (estadoTicket) {
+        estadoTicket.addEventListener('change', actualizarCampos);
+        // Ejecutar al cargar la página en caso de edición
+        actualizarCampos();
     }
+});
 </script>
+
 </body>
 </html>
