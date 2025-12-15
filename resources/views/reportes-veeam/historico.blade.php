@@ -20,7 +20,7 @@
                 <a href="{{ route('reportes-veeam.index') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     Ver Pendientes
                 </a>
-                <a href="{{ url('/') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                <a href="{{ route('menu.analista') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
                     Volver al Menú
                 </a>
             </div>
