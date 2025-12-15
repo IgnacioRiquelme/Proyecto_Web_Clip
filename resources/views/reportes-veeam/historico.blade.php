@@ -20,6 +20,12 @@
                 <a href="{{ route('reportes-veeam.index') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     Ver Pendientes
                 </a>
+                <form method="POST" action="{{ route('reportes-veeam.exportar') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        📄 Exportar Excel
+                    </button>
+                </form>
                 <a href="/menu-analista" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
                     Volver al Menú
                 </a>

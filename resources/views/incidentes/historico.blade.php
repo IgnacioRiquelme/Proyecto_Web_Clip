@@ -76,6 +76,17 @@
                 </a>
             </div>
         </form>
+        <form method="POST" action="{{ route('incidentes.exportar') }}" class="mt-4">
+            @csrf
+            @if(request('fecha_desde')) <input type="hidden" name="fecha_desde" value="{{ request('fecha_desde') }}"> @endif
+            @if(request('fecha_hasta')) <input type="hidden" name="fecha_hasta" value="{{ request('fecha_hasta') }}"> @endif
+            @if(request('proceso')) <input type="hidden" name="proceso" value="{{ request('proceso') }}"> @endif
+            @if(request('requerimiento')) <input type="hidden" name="requerimiento" value="{{ request('requerimiento') }}"> @endif
+            @if(request('estado')) <input type="hidden" name="estado" value="{{ request('estado') }}"> @endif
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition">
+                📄 Exportar Resultados a Excel
+            </button>
+        </form>
     </div>
 
     <!-- Estadísticas de resultados -->

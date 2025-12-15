@@ -23,6 +23,12 @@
                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition">
                 📊 Vista Histórica
             </a>
+            <form method="POST" action="{{ route('incidentes.exportar') }}" class="inline">
+                @csrf
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition">
+                    📄 Exportar Excel
+                </button>
+            </form>
         </div>
     </div>
 

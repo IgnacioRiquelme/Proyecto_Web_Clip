@@ -20,6 +20,13 @@
                 <a href="{{ route('reportes-veeam.historico') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     Ver Histórico
                 </a>
+                <form method="POST" action="{{ route('reportes-veeam.exportar') }}" class="inline">
+                    @csrf
+                    <input type="hidden" name="filtro_estado_ticket" value="Pendiente">
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        📄 Exportar Excel
+                    </button>
+                </form>
                 <a href="/menu-analista" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
                     Volver al Menú
                 </a>
