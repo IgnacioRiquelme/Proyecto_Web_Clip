@@ -71,6 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/{id}', [IncidenteController::class, 'update'])->name('update');
         Route::patch('/{id}/quick-update', [IncidenteController::class, 'quickUpdate'])->name('quickUpdate');
         Route::get('/search-proceso', [IncidenteController::class, 'searchProceso'])->name('searchProceso');
+        Route::post('/exportar', [IncidenteController::class, 'exportarExcel'])->name('exportar');
     });
     
     // === ACTUALIZACIONES INCIDENTES COMBOBOX ===
@@ -123,6 +124,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dia', [ReporteVeeamController::class, 'dia'])->name('dia');
         Route::get('/pendientes', [ReporteVeeamController::class, 'pendientes'])->name('pendientes');
         Route::post('/filtrados', [ReporteVeeamController::class, 'filtrados'])->name('filtrados');
+        Route::post('/exportar', [ReporteVeeamController::class, 'exportarExcel'])->name('exportar');
     });
 
     // Endpoints para guardar nuevos valores desde los combobox
