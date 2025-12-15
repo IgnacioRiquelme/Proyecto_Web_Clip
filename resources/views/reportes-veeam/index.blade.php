@@ -20,7 +20,7 @@
                 <a href="{{ route('reportes-veeam.historico') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     Ver Histórico
                 </a>
-                <a href="{{ route('menu.analista') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                <a href="/menu-analista" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
                     Volver al Menú
                 </a>
             </div>

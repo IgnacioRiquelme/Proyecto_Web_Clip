@@ -239,7 +239,7 @@
             {{-- Botones --}}
             <div class="flex justify-between items-center pt-6">
                     <div class="flex gap-2">
-                        <a href="{{ route('menu.analista') }}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded font-medium shadow transition">
+                        <a href="/menu-analista" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-2 rounded font-medium shadow transition">
                             Menú
                         </a>
                         <a href="{{ route('reportes-veeam.create') }}" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600">
